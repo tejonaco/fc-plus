@@ -3,6 +3,8 @@ import { useApi } from "./api"
 import Router, { Route } from "preact-router"
 import ForumDisplay from "./Pages/ForumDisplay"
 import ShowThread from "./Pages/ShowThread"
+import NewReply from "./Pages/NewReply"
+import NewThread from "./Pages/NewThread"
 
 
 export default function App({ profileButton }: { profileButton: HTMLButtonElement }) {
@@ -104,8 +106,10 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
 
             <div>
                 <Router>
-                    <Route path='/foro/forumdisplay.php/:forum?' component={ForumDisplay}/>
-                    <Route path='/foro/showthread.php/:thread?' component={() => <ShowThread ignoredUsers={ignoredUsers}/>}/>
+                    <Route path='/foro/forumdisplay.php/:f?' component={ForumDisplay}/>
+                    <Route path='/foro/showthread.php/:t?' component={() => <ShowThread ignoredUsers={ignoredUsers}/>}/>
+                    <Route path='/foro/newreply.php/:t?' component={() => <NewReply/>}/>
+                    <Route path='/foro/newthread.php/:t?' component={() => <NewThread/>}/>
                 </Router>
             </div>
         </div>
