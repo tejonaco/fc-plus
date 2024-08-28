@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "preact/hooks"
 import { useApi } from "./api"
+import Router, { Route } from "preact-router"
+import ForumDisplay from "./Pages/ForumDisplay"
+import ShowThread from "./Pages/ShowThread"
 
 
 export default function App({ profileButton }: { profileButton: HTMLButtonElement }) {
@@ -9,7 +12,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
     const [ignoredUsers, setIgnoredUsers] = useState<string[]>(GM_getValue('ignoredUsers', []))
     const { getIgnoredUsers } = useApi()
 
-    useEffect(()=> console.clear(), [])
+    // useEffect(()=> console.clear(), [])
 
 
     const handleProfileButtonClick = useCallback((e: MouseEvent) => {
@@ -33,40 +36,9 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
         return () => profileButton.removeEventListener('click', handleProfileButtonClick, { capture: true })
     }, [showMenu])
 
-    const hasIgnoredWord = (text: string) => {
-        for (const word of ignoredWords) {
-            if (word !== '' && text.toLowerCase().includes(' ' + word.toLowerCase() + ' ')) {
-                return true
-            }
-        }
-    }
-
-    useEffect(() => {
-        // console.clear()
-        const threads: NodeListOf<HTMLDivElement> = document.querySelectorAll('section > div:has(div > div > span > a)')
-        for (const thread of threads) {
-            const threadInfo = thread.querySelector('div > div:has(span > a)')
-            if (!threadInfo) return
-
-            const title = threadInfo.querySelector('span > a')?.textContent?.trim() ?? ''
-            const footerString = threadInfo.querySelector('div > a > span')?.textContent?.trim()
-            const user = footerString?.split(' - ')[0].slice(1) ?? ''
-
-            if (hasIgnoredWord(title) || ignoredUsers.includes(user)) {
-                thread.style.display = 'none'
-                console.log('Hidden thread: ', title, user)
-                const separator = thread.nextElementSibling
-                if (separator instanceof HTMLElement && separator.tagName == 'SEPARATOR') {
-                    separator.style.display = 'none'
-                }
-
-            }
-        }
-
-    }, [ignoredWords, ignoredUsers])
 
     return (
-        <div className='text-sm text-neutral-500'>
+        <div className='text-sm text-neutral-600'>
             {
                 (showMenu || showModal) &&
                 <>
@@ -76,12 +48,12 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                     }} />
 
                     <div className={`fixed z-20 top-[60px] right-[10px] bg-white min-w-32 min-h-32
-                            rounded-md overflow-y-auto flex ${showMenu ? 'flex' : 'hidden'}
-                            flex-col p-2 shadow-lg shadow-neutral-400`}
+                            rounded-md overflow-y-auto ${showMenu ? 'flex' : 'hidden'}
+                            flex-col p-2 shadow-md border-[1px] border-neutral-300 shadow-neutral-400`}
 
                     >
 
-                        <div className='border-b-2 border-neutral-300 cursor-pointer'
+                        <div className='border-b-2 border-neutral-200 py-1 cursor-pointer hover:text-orange-600'
                             onClick={() => {
                                 setShowModal(true)
                                 setShowMenu(false)
@@ -89,7 +61,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                         >
                             IGNORED WORDS
                         </div>
-                        <div className='border-b-2 border-neutral-300 cursor-pointer'
+                        <div className='border-b-2 border-neutral-200 py-1 cursor-pointer hover:text-orange-600'
                             onClick={() => {
                                 getIgnoredUsers((users) => {
                                     setIgnoredUsers(users)
@@ -129,6 +101,13 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                     </div>
                 </>
             }
+
+            <div>
+                <Router onChange={(e) => console.log('Change', e)}>
+                    <Route path='/foro/forumdisplay.php/:forum?' component={ForumDisplay}/>
+                    <Route path='/foro/showthread.php/:thread?' component={() => <ShowThread ignoredUsers={ignoredUsers}/>}/>
+                </Router>
+            </div>
         </div>
     )
 }
