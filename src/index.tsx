@@ -5,11 +5,14 @@ import './index.css'
 
 
 async function main() {
-  const parent = await awaitElement('#header');
+  const root = await awaitElement('body') as HTMLDivElement
+  const profileButton = await awaitElement('#usercptools') as HTMLButtonElement
   const container = document.createElement("div");
-  parent.appendChild(container)
+  root.appendChild(container)
 
-  insertElement(App, container)
+  render(<App profileButton={profileButton}/>,
+    container
+  );
 }
 
 
@@ -18,12 +21,6 @@ async function loadCSS () {
   GM_addStyle(style)
 }
 
-
-async function insertElement(Element: React.ComponentType, container: HTMLElement) {
-    render(<Element />,
-      container
-    );
-}
 
 document.addEventListener('DOMContentLoaded', () => {
   main()
