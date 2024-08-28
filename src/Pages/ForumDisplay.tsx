@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks"
-
+import { log } from "../utils"
 
 
 
@@ -29,7 +29,7 @@ export default function ForumDisplay() {
 
       if (hasIgnoredWord(title) || ignoredUsers.includes(user)) {
         thread.style.display = 'none'
-        console.log('Hidden thread: ', title, user)
+        log('Hidden thread: ', title, user)
         const separator = thread.nextElementSibling
         if (separator instanceof HTMLElement && separator.tagName == 'SEPARATOR') {
           separator.style.display = 'none'

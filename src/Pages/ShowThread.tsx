@@ -1,5 +1,6 @@
 import { useEffect } from "preact/hooks"
 import { pasteLink } from "../common"
+import { log } from "../utils"
 
 
 
@@ -30,7 +31,7 @@ export default function ShowThread({ ignoredUsers }: { ignoredUsers: string[] })
 
       if (ignoredUsers.includes(user)) {
         post.style.display = 'none'
-        console.log(`A post of "${user}" has been hidden`)
+        log(`A post of "${user}" has been hidden`)
       }
     }
 
