@@ -5,8 +5,7 @@ import './index.css'
 
 
 async function main() {
-  // EDIT THIS TO INSERT CONTAINER ON THE RIGHT PLACE
-  const parent = await awaitElement('#root');
+  const parent = await awaitElement('#header');
   const container = document.createElement("div");
   parent.appendChild(container)
 
