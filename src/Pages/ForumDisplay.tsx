@@ -1,16 +1,19 @@
-import { useEffect, useState } from "preact/hooks"
+import { useEffect } from "preact/hooks"
 import { log } from "../utils"
+import unidecode from "unidecode"
 
 
 
-export default function ForumDisplay() {
-  const [ignoredWords, ] = useState<string[]>(GM_getValue('ignoredWords', []))
-  const [ignoredUsers, ] = useState<string[]>(GM_getValue('ignoredUsers', []))
+export default function ForumDisplay({ignoredWords, ignoredUsers}: {ignoredWords: string[], ignoredUsers: string[]}) {
 
   const hasIgnoredWord = (text: string) => {
-    const textWords = text.toLowerCase().split(' ')
-    for (const word of ignoredWords) {
-      if (word !== '' && textWords.includes(word)) {
+    text = unidecode(text.toLowerCase())
+
+    for (let word of ignoredWords) {
+      word = unidecode(word.toLowerCase())
+      const regex = new RegExp(`\\b${word}\\b`)
+
+      if (word !== '' && text.match(regex)) {
         return true
       }
     }

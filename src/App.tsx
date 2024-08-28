@@ -106,7 +106,8 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
 
             <div>
                 <Router>
-                    <Route path='/foro/forumdisplay.php/:f?' component={ForumDisplay}/>
+                    <Route path='/foro/forumdisplay.php/:f?' component={() => <ForumDisplay ignoredWords={ignoredWords}
+                                                                                            ignoredUsers={ignoredUsers}/> }/>
                     <Route path='/foro/showthread.php/:t?' component={() => <ShowThread ignoredUsers={ignoredUsers}/>}/>
                     <Route path='/foro/newreply.php/:t?' component={() => <NewReply/>}/>
                     <Route path='/foro/newthread.php/:t?' component={() => <NewThread/>}/>
