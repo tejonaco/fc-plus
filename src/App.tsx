@@ -103,7 +103,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
             }
 
             <div>
-                <Router onChange={(e) => console.log('Change', e)}>
+                <Router>
                     <Route path='/foro/forumdisplay.php/:forum?' component={ForumDisplay}/>
                     <Route path='/foro/showthread.php/:thread?' component={() => <ShowThread ignoredUsers={ignoredUsers}/>}/>
                 </Router>

@@ -1,20 +1,36 @@
-import { useEffect, useState } from "preact/hooks"
+import { useEffect } from "preact/hooks"
+import { pasteLink } from "../common"
 
 
 
 
-export default function ShowThread({ignoredUsers}: {ignoredUsers: string[]}) {
+export default function ShowThread({ ignoredUsers }: { ignoredUsers: string[] }) {
 
   useEffect(() => {
-    console.log(ignoredUsers)
+    const iframe = document.querySelector('#vB_Editor_QR_iframe') as HTMLIFrameElement
+    const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document
+    if (!iframeDoc) return
+
+    const handlePaste = (e: ClipboardEvent) => {
+      pasteLink(e, iframe)
+    }
+
+    const textArea = iframeDoc.querySelector('body')
+    textArea?.addEventListener('paste', handlePaste)
+
+    return () => textArea && textArea.removeEventListener('paste', handlePaste)
+  }, [])
+
+
+  useEffect(() => {
     const posts: NodeListOf<HTMLDivElement> = document.querySelectorAll('div[id^="edit"]')
 
     for (const post of posts) {
       const user = post?.querySelector('a[href^="member"]:not(:has(img))')?.textContent?.trim() ?? ''
 
-      if(ignoredUsers.includes(user)) {
-          post.style.display = 'none'
-          console.log(`A post of "${user}" has been hidden`)
+      if (ignoredUsers.includes(user)) {
+        post.style.display = 'none'
+        console.log(`A post of "${user}" has been hidden`)
       }
     }
 
