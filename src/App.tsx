@@ -5,6 +5,8 @@ import ForumDisplay from "./Pages/ForumDisplay"
 import ShowThread from "./Pages/ShowThread"
 import NewReply from "./Pages/NewReply"
 import NewThread from "./Pages/NewThread"
+import * as icons from './Icons'
+import { log } from "./utils"
 
 
 export default function App({ profileButton }: { profileButton: HTMLButtonElement }) {
@@ -40,11 +42,11 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
 
 
     return (
-        <div className='text-sm text-neutral-600'>
+        <div className='text-md text-neutral-700'>
             {
                 (showMenu || showModal) &&
                 <>
-                    <div className={`fixed z-10 top-0 left-0 w-full h-full`} onClick={() => {
+                    <div className={`fixed z-10 top-0 left-0 w-full h-full bg-neutral-400 opacity-20`} onClick={() => {
                         setShowMenu(false)
                         setShowModal(false)
                     }} />
@@ -55,15 +57,16 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
 
                     >
 
-                        <div className='border-b-2 border-neutral-200 py-1 cursor-pointer hover:text-orange-600'
+                        <div className='border-b-2 flex gap-1 items-center border-neutral-200 py-1 cursor-pointer hover:text-orange-600'
                             onClick={() => {
                                 setShowModal(true)
                                 setShowMenu(false)
                             }}
                         >
-                            IGNORED WORDS
+                            <span className='w-4'>{icons.pencil}</span>
+                            Palabras ignoradas
                         </div>
-                        <div className='border-b-2 border-neutral-200 py-1 cursor-pointer hover:text-orange-600'
+                        <div className='border-b-2 flex gap-1 items-center border-neutral-200 py-1 cursor-pointer hover:text-orange-600'
                             onClick={() => {
                                 getIgnoredUsers((users) => {
                                     setIgnoredUsers(users)
@@ -73,33 +76,48 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                                 })
                             }}
                         >
-                            RELOAD IGNORED USERS
+                            <span className='w-4'>{icons.user}</span>
+                            Usuarios ignorados
                         </div>
                     </div>
 
-                    <div className={`w-60 h-60 fixed z-20 top-[80px] left-1/2 -translate-x-1/2
-                    bg-white shadow-md shadow-neutral-400 rounded-md p-2 ${showModal ? 'flex' : 'hidden'} flex-col items-center gap-2`}
-                        onClick={e => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            e.stopImmediatePropagation()
-                        }}>
+                    <div className={`fixed z-20 top-[80px] left-1/2 -translate-x-1/2
+                    bg-white shadow-md shadow-neutral-400 rounded-md p-2 ${showModal ? 'flex' : 'hidden'} flex-col items-center gap-2`}>
 
                         <div className='flex w-full justify-between'>
-                            <h1>Ignored list</h1>
+                            <div className='flex flex-col'>
+                                <h1 className='text-lg'>Palabras ignoradas</h1>
+                                <p className='text-sm text-neutral-600'>Una palabra / frase por linea</p>
+                            </div>
                             <button className='text-red-700' onClick={() => setShowModal(false)}>
                                 X
                             </button>
                         </div>
-                        <textarea className='w-full h-full border-2 border-neutral-200 resize-none p-1'
-                            onChange={({ target }) => {
-                                const newWords = (target as HTMLTextAreaElement).value.split('\n')
+
+                        <form className='flex flex-col w-full h-full gap-2'
+                            onSubmit={e => {
+                                e.preventDefault()
+                                const form = e.target as HTMLFormElement
+                                if (!form) return
+
+                                const textarea = form[0] as HTMLTextAreaElement
+                                const newWords =Array.from( new Set(textarea.value.split('\n')) ) // Set ignores duplicates
                                 setIgnoredWords(newWords)
                                 GM_setValue('ignoredWords', newWords)
+                                log('New ignored words: ', newWords.join(', '))
+                                setShowModal(false)
                             }}
                         >
-                            {ignoredWords.join('\n')}
-                        </textarea>
+                            <textarea className='w-72 h-52 border-2 border-neutral-200 resize-none p-1'>
+                                {ignoredWords.join('\n')}
+                            </textarea>
+                            <div className='w-full flex justify-end'>
+                                <button className='flex p-1 rounded-md bg-green-600'>
+                                    <span className='w-8 h-8 text-white'>{icons.save}</span>
+                                </button>
+                            </div>
+                        </form>
+
                     </div>
                 </>
             }
@@ -107,10 +125,10 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
             <div>
                 <Router>
                     <Route path='/foro/forumdisplay.php/:f?' component={() => <ForumDisplay ignoredWords={ignoredWords}
-                                                                                            ignoredUsers={ignoredUsers}/> }/>
-                    <Route path='/foro/showthread.php/:t?' component={() => <ShowThread ignoredUsers={ignoredUsers}/>}/>
-                    <Route path='/foro/newreply.php/:t?' component={() => <NewReply/>}/>
-                    <Route path='/foro/newthread.php/:t?' component={() => <NewThread/>}/>
+                        ignoredUsers={ignoredUsers} />} />
+                    <Route path='/foro/showthread.php/:t?' component={() => <ShowThread ignoredUsers={ignoredUsers} />} />
+                    <Route path='/foro/newreply.php/:t?' component={() => <NewReply />} />
+                    <Route path='/foro/newthread.php/:t?' component={() => <NewThread />} />
                 </Router>
             </div>
         </div>
