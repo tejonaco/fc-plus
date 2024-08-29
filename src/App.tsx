@@ -7,6 +7,7 @@ import NewReply from "./Pages/NewReply"
 import NewThread from "./Pages/NewThread"
 import * as icons from './Icons'
 import { log } from "./utils"
+import Profile from "./Pages/Profile"
 
 
 export default function App({ profileButton }: { profileButton: HTMLButtonElement }) {
@@ -16,7 +17,20 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
     const [ignoredUsers, setIgnoredUsers] = useState<string[]>(GM_getValue('ignoredUsers', []))
     const { getIgnoredUsers } = useApi()
 
+
     // useEffect(()=> console.clear(), [])
+
+    const loadIgnoredUsers = (raiseAlert = true) => {
+        getIgnoredUsers((users) => {
+            if (JSON.stringify(users) != JSON.stringify(ignoredUsers)) {
+                setIgnoredUsers(users)
+                GM_setValue('ignoredUsers', users)
+            }
+            raiseAlert && alert(`Ignored users loaded`)
+            log('Ignored users: ' + users.join(', '))
+            setShowMenu(false)
+        })
+    }
 
 
     const handleProfileButtonClick = useCallback((e: MouseEvent) => {
@@ -67,17 +81,10 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                             Palabras ignoradas
                         </div>
                         <div className='border-b-2 flex gap-1 items-center border-neutral-200 py-1 cursor-pointer hover:text-orange-600'
-                            onClick={() => {
-                                getIgnoredUsers((users) => {
-                                    setIgnoredUsers(users)
-                                    GM_setValue('ignoredUsers', users)
-                                    alert(`Ignored users loaded`)
-                                    setShowMenu(false)
-                                })
-                            }}
+                            onClick={() => loadIgnoredUsers()}
                         >
                             <span className='w-4'>{icons.user}</span>
-                            Usuarios ignorados
+                            Cargar usuarios ignorados
                         </div>
                     </div>
 
@@ -101,7 +108,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                                 if (!form) return
 
                                 const textarea = form[0] as HTMLTextAreaElement
-                                const newWords =Array.from( new Set(textarea.value.split('\n')) ) // Set ignores duplicates
+                                const newWords = Array.from(new Set(textarea.value.split('\n'))) // Set ignores duplicates
                                 setIgnoredWords(newWords)
                                 GM_setValue('ignoredWords', newWords)
                                 log('New ignored words: ', newWords.join(', '))
@@ -126,9 +133,12 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                 <Router>
                     <Route path='/foro/forumdisplay.php/:f?' component={() => <ForumDisplay ignoredWords={ignoredWords}
                         ignoredUsers={ignoredUsers} />} />
-                    <Route path='/foro/showthread.php/:t?' component={() => <ShowThread ignoredUsers={ignoredUsers} />} />
-                    <Route path='/foro/newreply.php/:t?' component={() => <NewReply />} />
-                    <Route path='/foro/newthread.php/:t?' component={() => <NewThread />} />
+                    <Route path='/foro/showthread.php' component={() => <ShowThread ignoredUsers={ignoredUsers} />} />
+                    <Route path='/foro/newreply.php' component={NewReply} />
+                    <Route path='/foro/newthread.php' component={NewThread} />
+                    <Route path='/foro/profile.php' component={(props: any) => <Profile userlist={props.userlist}
+                        do_={props.do}
+                        loadIgnoredUsers={loadIgnoredUsers} />} />
                 </Router>
             </div>
         </div>
