@@ -8,6 +8,7 @@ import NewThread from "./Pages/NewThread"
 import * as icons from './Icons'
 import { log } from "./utils"
 import Profile from "./Pages/Profile"
+import { SettingsModal } from "./Settings"
 
 
 function IgnoredWords({ closeModal, ignoredWords, setIgnoredWords }: {
@@ -49,8 +50,8 @@ function IgnoredWords({ closeModal, ignoredWords, setIgnoredWords }: {
 }
 
 
-function IgnoredUsers({ closeModal, ignoredUsers, loadIgnoredUsers }: {
-    closeModal: () => void, ignoredUsers: string[],
+function IgnoredUsers({ ignoredUsers, loadIgnoredUsers }: {
+    ignoredUsers: string[],
     loadIgnoredUsers: () => Promise<void>
 }) {
     const [loadingUsers, setLoadingUsers] = useState(false)
@@ -166,7 +167,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                         <div className='flex items-center justify-end'>
                             <button className='w-5 hover:text-orange-600'
                                 onClick={() => {
-                                    setShowModal('users')
+                                    setShowModal('settings')
                                     setShowMenu(false)
                                 }}
                             >
@@ -189,7 +190,11 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                         }
                         {
                             showModal == 'users' &&
-                            <IgnoredUsers closeModal={() => setShowModal(false)} ignoredUsers={ignoredUsers} loadIgnoredUsers={loadIgnoredUsers} />
+                            <IgnoredUsers ignoredUsers={ignoredUsers} loadIgnoredUsers={loadIgnoredUsers} />
+                        }
+                        {
+                            showModal == 'settings' &&
+                            <SettingsModal closeModal={() => setShowModal(false)}/>
                         }
 
                     </div>

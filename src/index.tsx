@@ -2,6 +2,7 @@ import App from "./App";
 import { awaitElement } from "./utils";
 import { render } from "preact";
 import './index.css'
+import { SettingsProvider } from "./Settings";
 
 
 async function main() {
@@ -10,7 +11,11 @@ async function main() {
   const container = document.createElement("div");
   root.appendChild(container)
 
-  render(<App profileButton={profileButton}/>,
+  render(
+    <SettingsProvider>
+      <App profileButton={profileButton}/>
+    </SettingsProvider>
+    ,
     container
   );
 }
