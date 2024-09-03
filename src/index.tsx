@@ -27,7 +27,5 @@ async function loadCSS () {
 }
 
 
-document.addEventListener('DOMContentLoaded', () => {
-  main()
-  loadCSS()
-});
+main()
+loadCSS()

@@ -6,7 +6,7 @@ const myConsole = console // save original console, just in case site overwrites
 export function log(message: any, ...optionalParams: any[]) {
     myConsole.log(
         `%c${pkg.name}:`,
-        'color: emerald; font-weight: bold',
+        'color: green; font-weight: bold',
         message, ...optionalParams
     );
 }
