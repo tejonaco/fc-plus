@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "preact/hooks"
+import { useCallback, useEffect, useRef, useState } from "preact/hooks"
 import { useApi } from "./api"
 import Router, { Route } from "preact-router"
 import ForumDisplay from "./Pages/ForumDisplay"
@@ -9,6 +9,8 @@ import * as icons from './Icons'
 import { log } from "./utils"
 import Profile from "./Pages/Profile"
 import { SettingsModal } from "./Settings"
+import { render } from "preact"
+import { createPortal } from "preact/compat"
 
 
 function IgnoredWords({ closeModal, ignoredWords, setIgnoredWords }: {
@@ -86,13 +88,68 @@ function IgnoredUsers({ ignoredUsers, loadIgnoredUsers }: {
     )
 }
 
+function MenuButton({ image, showMenu, setShowMenu }:
+    { image: HTMLImageElement, showMenu: boolean, setShowMenu: (value: boolean) => void }) {
+    const [showButton, setShowButton] = useState(false)
+    let timeout: ReturnType<typeof setTimeout>
+    image.removeAttribute('title')
+
+
+    return (
+        <div className='relative flex items-center justify-center rounded-full overflow-hidden'
+            title={`Menu de usuario.
+Manten el mouse o haz ctrl+click para ver el menu de fc-plus`}
+            onMouseEnter={() => timeout = setTimeout(() => setShowButton(true), 1500)}
+            onMouseLeave={() => {
+                clearTimeout(timeout)
+                setShowButton(false)
+            }}
+            onClick={e => {
+                clearTimeout(timeout)
+                if (e.ctrlKey && !showMenu) {
+                    setShowMenu(true)
+                    e.preventDefault()
+                    e.stopPropagation()
+                } else if (showMenu) {
+                    setShowMenu(false)
+                    e.preventDefault()
+                    e.stopPropagation()
+                }
+            }}
+        >
+
+            <button className={`header-profile-image absolute bg-neutral-200 transition-all duration-500
+              ${showButton ? 'translate-x-0' : 'translate-x-full'}
+              `}
+                onClick={e => {
+                    e.stopPropagation()
+                    console.log(showMenu)
+                    setShowMenu(!showMenu)
+                }}
+            >
+                <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Roto2.svg/240px-Roto2.svg.png' />
+            </button>
+            <div dangerouslySetInnerHTML={{ __html: image.outerHTML }} />
+        </div>
+    )
+
+}
+
 
 export default function App({ profileButton }: { profileButton: HTMLButtonElement }) {
-    const [showMenu, setShowMenu] = useState(true)
+    const [showMenu, setShowMenu] = useState(false)
     const [showModal, setShowModal] = useState<'words' | 'users' | 'settings' | false>(false)
     const [ignoredWords, setIgnoredWords] = useState<string[]>(GM_getValue('ignoredWords', []))
     const [ignoredUsers, setIgnoredUsers] = useState<string[]>(GM_getValue('ignoredUsers', []))
     const { getIgnoredUsers } = useApi()
+    const img = useRef(profileButton.querySelector('img') as HTMLImageElement)
+    const buttonContainer = useRef(document.createElement("div"))
+
+
+    useEffect(()=>{
+        img.current.replaceWith(buttonContainer.current)
+    }, [])
+
 
     async function loadIgnoredUsers() {
         return new Promise<void>(
@@ -107,41 +164,20 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
     }
 
 
-    const handleProfileButtonClick = useCallback((e: MouseEvent) => {
-
-        if (!showMenu && e.ctrlKey) {
-            e.preventDefault()
-            e.stopPropagation()
-            setShowMenu(true)
-        } else if (showMenu) {
-            e.preventDefault()
-            e.stopPropagation()
-            setShowMenu(false)
-        }
-    }, [showMenu])
-
-    useEffect(() => {
-        profileButton.addEventListener('click',
-            handleProfileButtonClick,
-            { capture: true }) // event is captured before other listerners
-
-        return () => profileButton.removeEventListener('click', handleProfileButtonClick, { capture: true })
-    }, [showMenu])
-
-
     return (
-        <div className='text-md text-neutral-600'>
+        <div className='text-md text-neutral-700'>
+            {createPortal(<MenuButton image={img.current} showMenu={showMenu} setShowMenu={setShowMenu} />, buttonContainer.current)}
             {
                 (showMenu || showModal) &&
                 <>
-                    <div className={`fixed z-10 top-0 left-0 w-full h-full bg-neutral-400 opacity-20`} onClick={() => {
+                    <div className={`fixed z-10 top-0 left-0 w-full h-full`} onClick={() => {
                         setShowMenu(false)
                         setShowModal(false)
                     }} />
 
                     <div className={`fixed z-20 top-[60px] right-[10px] bg-white min-w-32 min-h-40
-                            rounded-md overflow-y-auto ${showMenu ? 'flex' : 'hidden'}
-                            flex-col justify-between p-2 shadow-md border-[1px] border-neutral-300 shadow-neutral-400`}
+                            rounded-lg overflow-y-auto ${showMenu ? 'flex' : 'hidden'}
+                            flex-col justify-between p-3 shadow-md border-[1px] border-neutral-300 shadow-neutral-400`}
 
                     >
                         <div className='flex flex-col gap-1.5'>
@@ -194,7 +230,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                         }
                         {
                             showModal == 'settings' &&
-                            <SettingsModal closeModal={() => setShowModal(false)}/>
+                            <SettingsModal closeModal={() => setShowModal(false)} />
                         }
 
                     </div>
