@@ -1,0 +1,64 @@
+name: Build, Release, and Update Tag
+on:
+  push:
+    tags:
+      - "*"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      run: npm install
+    - name: Build the project
+      run: npm run build
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: v${{ github.ref }}
+        draft: false
+        prerelease: false
+    - name: Upload Release Assets
+      uses: actions/github-script@v6
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        script: |
+          const fs = require('fs').promises;
+          const path = require('path');
+          
+          const uploadAsset = async (file) => {
+            const fileName = path.basename(file);
+            const fileContent = await fs.readFile(file);
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ steps.create_release.outputs.id }},
+              name: fileName,
+              data: fileContent
+            });
+          };
+          
+          const uploadDir = async (dir) => {
+            const files = await fs.readdir(dir);
+            for (const file of files) {
+              const filePath = path.join(dir, file);
+              const stat = await fs.stat(filePath);
+              if (stat.isDirectory()) {
+                await uploadDir(filePath);
+              } else {
+                await uploadAsset(filePath);
+              }
+            }
+          };
+          
+          await uploadDir('./dist');

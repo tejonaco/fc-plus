@@ -1,7 +1,15 @@
 import preact from '@preact/preset-vite'
 import { ConfigEnv, UserConfig, defineConfig } from "vite";
 import fs from 'fs';
+import {version} from "./package.json"
 
+function prepareHeader() {
+  const fileContents = fs.readFileSync('src/userscript-header.js', 'utf-8')
+
+  const css = process.env.WATCH? 'style.css': `https://github.com/tejonaco/fc-plus/releases/download/${version}/style.css`
+
+  return fileContents.replace('{{version}}', version).replace('{{css}}', css)
+}
 
 export default defineConfig((mode: ConfigEnv): UserConfig => {
   return {
@@ -10,7 +18,9 @@ export default defineConfig((mode: ConfigEnv): UserConfig => {
       target: "esnext",
       minify: false,
       outDir: "dist",
-      watch: 'src',
+      watch: {
+        include: 'src'
+      },
       lib: {
         entry: 'src/index.tsx',
         name: 'index',
@@ -19,7 +29,7 @@ export default defineConfig((mode: ConfigEnv): UserConfig => {
       },
       rollupOptions: {
         output: {
-          banner: () => fs.readFileSync('src/userscript-header.js', 'utf-8')
+          banner: prepareHeader
         },
       }
     },
