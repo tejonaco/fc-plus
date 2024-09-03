@@ -1,13 +1,17 @@
 import { useEffect } from "preact/hooks"
 import { pasteLink } from "../common"
 import { log } from "../utils"
+import { useSettings } from "../Settings"
 
 
 
 
 export default function NewThread() {
+  const [settings] = useSettings()
 
   useEffect(() => {
+    if (!settings.easySocialMediaLinks) return
+
     const iframe = document.querySelector('#vB_Editor_001_iframe') as HTMLIFrameElement
     const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document
     if (!iframeDoc) return

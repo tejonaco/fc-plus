@@ -48,6 +48,7 @@ export function SettingsModal({ closeModal }: { closeModal: () => void }) {
         onSubmit={e => {
           e.preventDefault()
           updateSettings(settings)
+          closeModal()
         }}
       >
         <div className='flex flex-col gap-1 p-2 border-2 rounded-md border-neutral-100'>
@@ -74,7 +75,7 @@ export function SettingsModal({ closeModal }: { closeModal: () => void }) {
           </label>
         </div>
         <div className='w-full flex justify-end'>
-          <button className='flex p-1 rounded-md bg-green-600'>
+          <button className='flex p-1 rounded-md bg-emerald-600 hover:bg-emerald-700'>
             <span className='w-8 h-8 text-white'>{save}</span>
           </button>
         </div>

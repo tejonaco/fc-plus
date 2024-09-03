@@ -1,13 +1,17 @@
 import { useEffect } from "preact/hooks"
 import { pasteLink } from "../common"
 import { log } from "../utils"
+import { useSettings } from "../Settings"
 
 
 
 
 export default function ShowThread({ ignoredUsers }: { ignoredUsers: string[] }) {
+  const [settings] = useSettings()
 
   useEffect(() => {
+    if (!settings.easySocialMediaLinks) return
+
     const iframe = document.querySelector('#vB_Editor_QR_iframe') as HTMLIFrameElement
     const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document
     if (!iframeDoc) return
@@ -24,6 +28,8 @@ export default function ShowThread({ ignoredUsers }: { ignoredUsers: string[] })
 
 
   useEffect(() => {
+    if (!settings.excludeIgnoredUsersComments) return
+
     const posts: NodeListOf<HTMLDivElement> = document.querySelectorAll('div[id^="edit"]')
 
     for (const post of posts) {

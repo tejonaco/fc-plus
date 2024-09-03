@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "preact/hooks"
+import { useEffect, useRef, useState } from "preact/hooks"
 import { useApi } from "./api"
 import Router, { Route } from "preact-router"
 import ForumDisplay from "./Pages/ForumDisplay"
@@ -9,7 +9,6 @@ import * as icons from './Icons'
 import { log } from "./utils"
 import Profile from "./Pages/Profile"
 import { SettingsModal } from "./Settings"
-import { render } from "preact"
 import { createPortal } from "preact/compat"
 
 
@@ -42,7 +41,7 @@ function IgnoredWords({ closeModal, ignoredWords, setIgnoredWords }: {
                     {ignoredWords.join('\n')}
                 </textarea>
                 <div className='w-full flex justify-end'>
-                    <button className='flex p-1 rounded-md bg-green-600'>
+                    <button className='flex p-1 rounded-md bg-emerald-600  hover:bg-emerald-700'>
                         <span className='w-8 h-8 text-white'>{icons.save}</span>
                     </button>
                 </div>
@@ -69,8 +68,16 @@ function IgnoredUsers({ ignoredUsers, loadIgnoredUsers }: {
             <textarea disabled className='w-72 h-52 border-2 border-neutral-200 resize-none p-1 text-neutral-500'>
                 {ignoredUsers.join('\n')}
             </textarea>
-            <div className='w-full flex justify-end'>
-                <button className='flex p-1 rounded-md bg-green-600 group'
+            <div className='w-full flex justify-end gap-2'>
+                <button className='flex p-1 rounded-md bg-emerald-600  hover:bg-emerald-700 group'
+                    title='Ir a lista de ignorados'
+                    onClick={() => {
+                        open('https://forocoches.com/foro/profile.php?do=ignorelist', '_blank')
+                    }}
+                >
+                    <span className='w-8 h-8 text-white group-disabled:animate-spin'>{icons.pencil}</span>
+                </button>
+                <button className='flex p-1 rounded-md bg-emerald-600  hover:bg-emerald-700 group'
                     disabled={loadingUsers}
                     title='Recargar usuarios'
                     onClick={async () => {
@@ -98,7 +105,7 @@ function MenuButton({ image, showMenu, setShowMenu }:
     return (
         <div className='relative flex items-center justify-center rounded-full overflow-hidden'
             title={`Menu de usuario.
-Manten el mouse o haz ctrl+click para ver el menu de fc-plus`}
+Manten el mouse o haz ctrl+click para ver el menu de fc-plus.`}
             onMouseEnter={() => timeout = setTimeout(() => setShowButton(true), 1500)}
             onMouseLeave={() => {
                 clearTimeout(timeout)
@@ -146,7 +153,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
     const buttonContainer = useRef(document.createElement("div"))
 
 
-    useEffect(()=>{
+    useEffect(() => {
         img.current.replaceWith(buttonContainer.current)
     }, [])
 
@@ -181,7 +188,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
 
                     >
                         <div className='flex flex-col gap-1.5'>
-                            <div className='border-b-0 flex gap-1.5 items-center border-neutral-200 cursor-pointer hover:text-orange-600'
+                            <div className='border-b-0 flex gap-1.5 items-center border-neutral-200 cursor-pointer hover:text-emerald-600'
                                 onClick={() => {
                                     setShowModal('words')
                                     setShowMenu(false)
@@ -190,7 +197,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                                 <span className='w-5'>{icons.pencil}</span>
                                 Palabras ignoradas
                             </div>
-                            <div className='border-b-0 flex gap-1.5 items-center border-neutral-200 cursor-pointer hover:text-orange-600'
+                            <div className='border-b-0 flex gap-1.5 items-center border-neutral-200 cursor-pointer hover:text-emerald-600'
                                 onClick={() => {
                                     setShowModal('users')
                                     setShowMenu(false)
@@ -201,7 +208,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
                             </div>
                         </div>
                         <div className='flex items-center justify-end'>
-                            <button className='w-5 hover:text-orange-600'
+                            <button className='w-5 hover:text-emerald-600'
                                 onClick={() => {
                                     setShowModal('settings')
                                     setShowMenu(false)
