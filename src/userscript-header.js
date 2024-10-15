@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name     FC Plus
+// @name     {{name}}
 // @namespce tejonaco
 // @version  {{version}}
 // @description Extensión para forocoches.com

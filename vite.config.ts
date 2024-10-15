@@ -8,7 +8,9 @@ function prepareHeader() {
 
   const css = process.env.WATCH? 'style.css': `https://github.com/tejonaco/fc-plus/releases/download/${version}/style.css`
 
-  return fileContents.replace('{{version}}', version).replace('{{css}}', css)
+  const name = process.env.WATCH? 'FC Plus (DEV)': 'FC Plus'
+
+  return fileContents.replace('{{version}}', version).replace('{{css}}', css).replace('{{name}}', name)
 }
 
 export default defineConfig((mode: ConfigEnv): UserConfig => {
