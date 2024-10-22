@@ -82,9 +82,7 @@ function IgnoredUsers({ ignoredUsers, loadIgnoredUsers }: {
                     title='Recargar usuarios'
                     onClick={async () => {
                         setLoadingUsers(true)
-                        log(1)
                         await loadIgnoredUsers()
-                        log('2')
                         setLoadingUsers(false)
                     }}
                 >
@@ -130,7 +128,6 @@ Manten el mouse o haz ctrl+click para ver el menu de fc-plus.`}
               `}
                 onClick={e => {
                     e.stopPropagation()
-                    console.log(showMenu)
                     setShowMenu(!showMenu)
                 }}
             >
