@@ -1,4 +1,4 @@
-import { ask } from './providers/githubModels'
+import { ask } from './providers/cloudfare'
 
 const tags = { politica: 'critica o debate sobre cualquier partido político o medida tomada por estos', futbol: 'noticias o discursion sobre fútbol o peñas futbolísticas' }
 
@@ -11,8 +11,7 @@ export async function tagTitles(titles: string[]) {
       .join('\n')}.
     "otros": el titulo no encaja con ninguna de las categorias anteriores
     
-    Eres parte de un programa informático, por lo que tu respuesta debe de ser predecible y tener este formato:
-    ["tag1", "tag3", "otros", ...]
+    TU RESPUESTA ESPERA UNICAMENTE UN ARRAY DE STRINGS QUE CONTENGA UNICAMENTE LAS CATEGORIAS QUE SERÁ INTRODUCIDO DIRECTAMENTE EN JSON.parse()
     `
 
   const response = await ask(prompt, titles)
