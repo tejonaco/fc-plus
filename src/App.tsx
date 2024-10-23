@@ -297,7 +297,7 @@ export default function App({ profileButton }: { profileButton: HTMLButtonElemen
               </button>
             </div>
 
-            <div className="max-h-80 overflow-y-auto">
+            <div className="max-h-96 overflow-y-auto">
               {showModal == 'words' && <IgnoredWords closeModal={() => setShowModal(false)} ignoredWords={ignoredWords} setIgnoredWords={setIgnoredWords} />}
               {showModal == 'users' && <IgnoredUsers ignoredUsers={ignoredUsers} loadIgnoredUsers={loadIgnoredUsers} />}
               {showModal == 'tags' && <Tags tags={tags} setTags={setTags} />}

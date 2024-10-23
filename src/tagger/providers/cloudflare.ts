@@ -1,10 +1,9 @@
-import { log } from "../../utils"
+import { ApiCreds } from '../../..'
+import { log } from '../../utils'
 
-const token = import.meta.env.VITE_GITHUB_TOKEN
-const endpoint = 'https://models.inference.ai.azure.com'
-const modelName = 'gpt-4o'
+const model = 'meta/llama-3.1-70b-instruct'
 
-export function ask(prompt: string, titles: string[]) {
+export function ask(prompt: string, titles: string[], creds: ApiCreds) {
   return new Promise<string>((resolve, reject) => {
     const body = {
       messages: [
@@ -14,28 +13,20 @@ export function ask(prompt: string, titles: string[]) {
         },
         { role: 'user', content: titles.join('\n') },
       ],
-      temperature: 1.0,
-      top_p: 1.0,
-      max_tokens: 1000,
-      model: modelName,
     }
 
     GM_xmlhttpRequest({
       method: 'POST',
-      url: endpoint + '/chat/completions',
+      url: `https://api.cloudflare.com/client/v4/accounts/${creds.id}/ai/run/@cf/${model}`,
       data: JSON.stringify(body),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token,
+        Authorization: 'Bearer ' + creds.token,
       },
       onload: function (response) {
         const resp = JSON.parse(response.response as string)
 
-        if (!resp.choices) {
-          return reject(['Error in response', resp])
-        }
-
-        const content: string = resp.choices[0].message.content
+        const content: string = resp.result.response
         log(content)
         resolve(content)
       },

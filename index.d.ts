@@ -7,3 +7,8 @@ export interface Tag {
   description: string
   color: string
 }
+
+export interface ApiCreds {
+  token: string
+  id?: string
+}

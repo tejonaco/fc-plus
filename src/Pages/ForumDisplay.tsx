@@ -2,11 +2,12 @@ import { useEffect, useMemo } from 'preact/hooks'
 import { log } from '../utils'
 import unidecode from 'unidecode'
 import { useSettings } from '../Settings'
-import { tagTitles } from '../tagger/tagger'
+import { useTagger } from '../tagger/tagger'
 import { Tag } from '../..'
 
 export default function ForumDisplay({ ignoredWords, ignoredUsers, tags }: { ignoredWords: string[]; ignoredUsers: string[]; tags: Tag[] }) {
   const [settings] = useSettings()
+  const tagTitles = useTagger()
 
   const tagColors = useMemo(() => {
     let res: { [tag: string]: string } = {}
@@ -63,6 +64,8 @@ export default function ForumDisplay({ ignoredWords, ignoredUsers, tags }: { ign
   }, [ignoredWords, ignoredUsers])
 
   useEffect(() => {
+    if (!settings.tags.enable) return
+
     const threads: NodeListOf<HTMLDivElement> = document.querySelectorAll('section > div:has(div > div > span > a)')
     const titles = Array.from(threads).map((thread) => thread.querySelector('div > div > span > a')?.textContent?.trim() ?? '')
 

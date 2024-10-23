@@ -2,12 +2,11 @@
 
 import { log } from '../../utils'
 
-const token = import.meta.env.VITE_GLHF_TOKEN
 const endpoint = `https://glhf.chat/api/openai/v1/chat/completions`
 
 const model = 'hf:Qwen/Qwen2.5-72B-Instruct'
 
-export function ask(prompt: string, titles: string[]) {
+export function ask(prompt: string, titles: string[], token: string) {
   return new Promise<string>((resolve, reject) => {
     const body = {
       messages: [
