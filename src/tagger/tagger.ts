@@ -1,4 +1,4 @@
-import { ask } from './providers/cloudfare'
+import { ask } from './providers/glhf'
 
 const tags = { politica: 'critica o debate sobre cualquier partido político o medida tomada por estos', futbol: 'noticias o discursion sobre fútbol o peñas futbolísticas' }
 
