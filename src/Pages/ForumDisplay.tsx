@@ -2,7 +2,7 @@ import { useEffect } from 'preact/hooks'
 import { log } from '../utils'
 import unidecode from 'unidecode'
 import { useSettings } from '../Settings'
-import { tagTitles } from '../tagger'
+import { tagTitles } from '../tagger/tagger'
 
 export default function ForumDisplay({ ignoredWords, ignoredUsers }: { ignoredWords: string[]; ignoredUsers: string[] }) {
   const [settings] = useSettings()
@@ -58,12 +58,16 @@ export default function ForumDisplay({ ignoredWords, ignoredUsers }: { ignoredWo
 
     tagTitles(titles).then((tags) => {
       for (const [i, tag] of tags.entries()) {
-        if (tag === 'politica') {
-          const titleSpan = threads[i].querySelector<HTMLSpanElement>('span > a > span')
+        const titleSpan = threads[i].querySelector<HTMLSpanElement>('span > a > span')
+        if (!titleSpan) continue
 
-          if (titleSpan) {
+        switch (tag) {
+          case 'politica':
             titleSpan.style.color = '#6b21a8'
-          }
+            break
+          case 'futbol':
+            titleSpan.style.color = '#009e60'
+            break
         }
       }
     })

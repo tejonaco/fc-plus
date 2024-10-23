@@ -1,25 +1,18 @@
+import { log } from "../../utils"
+
 const token = import.meta.env.VITE_GITHUB_TOKEN
 const endpoint = 'https://models.inference.ai.azure.com'
 const modelName = 'gpt-4o'
-const tags = { politica: 'critica o debate sobre cualquier partido político o medida tomada por estos' }
 
-export async function tagTitles(titles: string[]) {
-  return new Promise<string[]>((resolve, reject) => {
+export function ask(prompt: string, titles: string[]) {
+  return new Promise<string>((resolve, reject) => {
     const body = {
       messages: [
         {
           role: 'system',
-          content: `
-          Debes clasificar cada titulo con una de las siguientes categorías, acompañadas de su explicación:
-          ${Object.entries(tags)
-            .map((e) => `"${e[0]}": ${e[1]}`)
-            .join('\n')}.
-          "otros": el titulo no encaja con ninguna de las categorias anteriores
-
-          Responde con una lista de categorías, escritas de forma exacta separadas por comas [..., ...].
-          `,
+          content: prompt,
         },
-        { role: 'user', content: JSON.stringify(titles) },
+        { role: 'user', content: titles.join('\n') },
       ],
       temperature: 1.0,
       top_p: 1.0,
@@ -37,9 +30,14 @@ export async function tagTitles(titles: string[]) {
       },
       onload: function (response) {
         const resp = JSON.parse(response.response as string)
+
+        if (!resp.choices) {
+          return reject(['Error in response', resp])
+        }
+
         const content: string = resp.choices[0].message.content
-        console.log(resp)
-        resolve(JSON.parse(content))
+        log(content)
+        resolve(content)
       },
       onerror: function (error) {
         reject(error)
