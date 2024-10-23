@@ -7,3 +7,11 @@
   align-items: center !important;
   gap: 5px !important;
 }
+
+.overflow-y-auto {
+  scrollbar-width: none;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  display: none;
+}

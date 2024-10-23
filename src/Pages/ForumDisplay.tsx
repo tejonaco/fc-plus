@@ -1,11 +1,20 @@
-import { useEffect } from 'preact/hooks'
+import { useEffect, useMemo } from 'preact/hooks'
 import { log } from '../utils'
 import unidecode from 'unidecode'
 import { useSettings } from '../Settings'
 import { tagTitles } from '../tagger/tagger'
+import { Tag } from '../..'
 
-export default function ForumDisplay({ ignoredWords, ignoredUsers }: { ignoredWords: string[]; ignoredUsers: string[] }) {
+export default function ForumDisplay({ ignoredWords, ignoredUsers, tags }: { ignoredWords: string[]; ignoredUsers: string[]; tags: Tag[] }) {
   const [settings] = useSettings()
+
+  const tagColors = useMemo(() => {
+    let res: { [tag: string]: string } = {}
+    for (const tag of tags) {
+      res[tag.name] = tag.color
+    }
+    return res
+  }, [tags])
 
   const hasIgnoredWord = (text: string) => {
     text = unidecode(text.toLowerCase())
@@ -32,15 +41,11 @@ export default function ForumDisplay({ ignoredWords, ignoredUsers }: { ignoredWo
   useEffect(() => {
     const threads: NodeListOf<HTMLDivElement> = document.querySelectorAll('section > div:has(div > div > span > a)')
 
-    const titles: string[] = []
-
     for (const thread of threads) {
       const threadInfo = thread.querySelector('div > div:has(span > a)')
       if (!threadInfo) return
 
       const title = threadInfo.querySelector('span > a')?.textContent?.trim() ?? ''
-
-      titles.push(title)
 
       const footerString = threadInfo.querySelector('div > a > span')?.textContent?.trim()
       const user = footerString?.split(' - ')[0].slice(1) ?? ''
@@ -55,23 +60,23 @@ export default function ForumDisplay({ ignoredWords, ignoredUsers }: { ignoredWo
         log(`Ocultado el hilo "${title}" del usuario "@${user}"`)
       }
     }
+  }, [ignoredWords, ignoredUsers])
 
-    tagTitles(titles).then((tags) => {
-      for (const [i, tag] of tags.entries()) {
+  useEffect(() => {
+    const threads: NodeListOf<HTMLDivElement> = document.querySelectorAll('section > div:has(div > div > span > a)')
+    const titles = Array.from(threads).map((thread) => thread.querySelector('div > div > span > a')?.textContent?.trim() ?? '')
+
+    tagTitles(titles, tags).then((titlesTags) => {
+      for (const [i, tag] of titlesTags.entries()) {
         const titleSpan = threads[i].querySelector<HTMLSpanElement>('span > a > span')
         if (!titleSpan) continue
 
-        switch (tag) {
-          case 'politica':
-            titleSpan.style.color = '#6b21a8'
-            break
-          case 'futbol':
-            titleSpan.style.color = '#009e60'
-            break
+        if (tag in tagColors) {
+          titleSpan.style.color = tagColors[tag]
         }
       }
     })
-  }, [ignoredWords, ignoredUsers])
+  }, [tags])
 
   return <></>
 }

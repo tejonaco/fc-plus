@@ -18,7 +18,7 @@ export default defineConfig((mode: ConfigEnv): UserConfig => {
     plugins: [preact()],
     build: {
       target: "esnext",
-      minify: false,
+      minify: !process.env.WATCH,
       outDir: "dist",
       watch: {
         include: 'src'
